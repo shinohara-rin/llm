@@ -1,13 +1,99 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>lofi-looping-machine</title>
+    <title>LLM - Lo-Fi Looping Machine</title>
+    <!-- Font for retro feel -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   </head>
-  <body>
-    <div id="app"></div>
+  <body class="relative">
+    <div id="app">
+      <!-- Header -->
+      <header class="h-16 flex items-center justify-between px-6 border-b border-neon-purple/30 bg-black/60 backdrop-blur">
+        <h1 class="text-3xl font-display text-neon-purple drop-shadow-[0_0_8px_rgba(176,38,255,0.8)]">
+          LLM <span class="text-white text-lg opacity-80"> // LO-FI LOOPING MACHINE</span>
+        </h1>
+        <button id="btn-settings" class="text-neon-blue hover:text-white transition-colors cursor-pointer">
+          [SETTINGS]
+        </button>
+      </header>
+
+      <!-- Main Deck -->
+      <main class="flex-1 flex flex-col p-6 gap-6 relative z-10 w-full max-w-5xl mx-auto">
+        
+        <!-- Visualizer Screen -->
+        <section class="relative h-64 border-2 border-neon-blue/50 rounded-lg bg-black overflow-hidden shadow-[0_0_20px_rgba(0,233,255,0.2)]">
+            <canvas id="visualizer-canvas" class="w-full h-full"></canvas>
+            <div class="absolute top-2 left-2 text-xs text-neon-blue/80 pointer-events-none">
+              SPECTRAL ANALYSIS // 20Hz - 20kHz
+            </div>
+            <!-- CRT Scanline Overlay -->
+            <div class="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-20 pointer-events-none bg-[length:100%_4px,3px_100%]"></div>
+        </section>
+
+        <!-- Terminal & Controls Row -->
+        <div class="flex flex-col md:flex-row gap-6 h-full min-h-0">
+          
+          <!-- Code Terminal -->
+          <div class="flex-1 border-2 border-green-500/30 bg-black/80 rounded-lg p-4 font-mono text-sm text-green-400 overflow-hidden flex flex-col shadow-[0_0_15px_rgba(34,197,94,0.1)]">
+            <div class="text-xs text-green-600 mb-2 border-b border-green-900 pb-1">KERNEL LOG Stream...</div>
+            <pre id="terminal-output" class="flex-1 overflow-y-auto whitespace-pre-wrap leading-tight scrollbar-hide font-display pt-2"></pre>
+          </div>
+
+          <!-- Controls Deck -->
+          <div class="w-full md:w-64 flex flex-col gap-4">
+             <div class="p-4 border border-neon-purple/40 bg-slate-900/80 rounded-lg flex flex-col gap-4">
+                <div class="text-neon-purple text-center font-display border-b border-neon-purple/20 pb-2">CONTROLS</div>
+                
+                <button id="btn-generate" class="group relative py-4 px-6 bg-neon-purple/10 border border-neon-purple text-neon-purple hover:bg-neon-purple hover:text-white transition-all duration-200 uppercase tracking-widest font-bold cursor-pointer overflow-hidden">
+                    <span class="relative z-10">GENERATE</span>
+                    <div class="absolute inset-0 bg-neon-purple/20 transform -translate-x-full group-hover:translate-x-0 transition-transform"></div>
+                </button>
+
+                <button id="btn-play" class="py-3 px-6 bg-slate-800 border border-slate-600 text-gray-400 hover:text-white hover:border-white transition-all cursor-pointer uppercase tracking-widest font-bold">
+                    PLAY
+                </button>
+             </div>
+
+             <!-- Status Blocks -->
+             <div class="grid grid-cols-2 gap-2 text-xs font-mono text-center">
+                 <div class="bg-black/50 p-2 border border-white/10 text-white/50">CPU: NORMAL</div>
+                 <div class="bg-black/50 p-2 border border-white/10 text-white/50">DSP: ONLINE</div>
+             </div>
+          </div>
+
+        </div>
+      </main>
+
+      <!-- Settings Modal -->
+      <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+        <div class="bg-slate-900 border-2 border-neon-purple p-8 rounded-lg w-full max-w-md shadow-[0_0_50px_rgba(176,38,255,0.3)]">
+            <h2 class="text-2xl text-neon-purple font-display mb-6">SYSTEM CONFIG</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-neon-blue mb-1">API KEY (Gemini/OpenAI)</label>
+                    <input type="password" id="api-key" class="w-full bg-black/50 border border-slate-700 p-2 text-white focus:border-neon-blue outline-none rounded" placeholder="sk-...">
+                </div>
+                <div>
+                    <label class="block text-xs text-neon-blue mb-1">BASE URL</label>
+                    <input type="text" id="base-url" class="w-full bg-black/50 border border-slate-700 p-2 text-white focus:border-neon-blue outline-none rounded" placeholder="https://generativelanguage.googleapis.com/v1beta/openai/">
+                    <p class="text-[10px] text-gray-500 mt-1">Leave default for OpenAI, or paste Gemini compatible endpoint.</p>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-4 mt-8">
+                <button class="close-settings px-4 py-2 text-gray-400 hover:text-white transition-colors cursor-pointer">CANCEL</button>
+                <button class="save-settings px-4 py-2 bg-neon-purple hover:bg-neon-purple/80 text-white font-bold rounded shadow-[0_0_15px_rgba(176,38,255,0.4)] cursor-pointer">SAVE SYSTEM</button>
+            </div>
+        </div>
+      </div>
+
+    </div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
