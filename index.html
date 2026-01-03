@@ -84,6 +84,17 @@
                     <input type="text" id="base-url" class="w-full bg-black/50 border border-slate-700 p-2 text-white focus:border-neon-blue outline-none rounded" placeholder="https://generativelanguage.googleapis.com/v1beta/openai/">
                     <p class="text-[10px] text-gray-500 mt-1">Leave default for OpenAI, or paste Gemini compatible endpoint.</p>
                 </div>
+                <div>
+                    <label class="block text-xs text-neon-blue mb-1">MODEL</label>
+                    <div class="flex gap-2">
+                        <select id="model-select" class="flex-1 bg-black/50 border border-slate-700 p-2 text-white focus:border-neon-blue outline-none rounded appearance-none">
+                            <option value="gpt-4o">gpt-4o (Default)</option>
+                        </select>
+                        <button id="btn-refresh-models" class="px-3 bg-slate-800 hover:bg-slate-700 text-neon-blue border border-slate-700 rounded transition-colors cursor-pointer" title="Fetch Models from API">
+                            ↻
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div class="flex justify-end gap-4 mt-8">
