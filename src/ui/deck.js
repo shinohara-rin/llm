@@ -107,9 +107,22 @@ export class Deck {
         
         this.terminal.log(`Compiling ${name}...`);
         
+        // --- PATCH START ---
+        // Rename the processor class and registration to avoid collision in AudioWorkletGlobalScope
+        const className = `ProceduralGen_${name}`;
+        const keyName = `${name}-gen`;
+
+        // 1. Replace Class Definition
+        code = code.replace(/class\s+ProceduralGen\s+extends/g, `class ${className} extends`);
+        // 2. Replace Register Call
+        code = code.replace(/registerProcessor\s*\(\s*['"]procedural-gen['"]\s*,/g, `registerProcessor('${keyName}',`);
+        // 3. Replace Class reference in Register Call
+        code = code.replace(/,\s*ProceduralGen\s*\)\s*;/g, `, ${className});`);
+        // --- PATCH END ---
+
         const success = await loadWorkletFromString(name, code);
         if (success) {
-            const node = createWorkletNode('procedural-gen');
+            const node = createWorkletNode(keyName);
             node.connect(engine.masterBus);
             this.nodes[name] = node;
             this.terminal.log(`${name} [ONLINE]`);
